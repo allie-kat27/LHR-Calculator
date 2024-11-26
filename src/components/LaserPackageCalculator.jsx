@@ -36,9 +36,11 @@ const serviceCategories = {
 
 const packages = {
   'Unlimited': { sessions: 12, discount: 0.25 },
-  '6 Pack': { sessions: 6, discount: 0.0 },
+  'Standard 6 Pack': { sessions: 6, discount: 0.0 },
   '6+1 Pack': { sessions: 7, discount: 0.14 },
-  'BOGO 20': { sessions: 6, discount: 0.0 }
+  'BOGO 20': { sessions: 6, discount: 0.0 },
+  'Touch Up 4 Pack': { sessions: 4, discount: 0.25 },
+  'Touch Up 3 Pack': { sessions: 3, discount: 0.0 }
 };
 
 const getPackageDisplayText = (name) => {
@@ -49,8 +51,12 @@ const getPackageDisplayText = (name) => {
       return '6+1 Pack (14% off)';
     case 'BOGO 20':
       return 'BOGO 20 - Buy One Get One 20% Off';
+    case 'Touch Up 4 Pack':
+      return 'Touch Up 4 Pack (25% off)';
+    case 'Touch Up 3 Pack':
+      return 'Touch Up 3 Pack';
     default:
-      return '6 Pack';
+      return 'Standard 6 Pack';
   }
 };
 
@@ -118,8 +124,12 @@ const LaserPackageCalculator = () => {
   return (
     <Card className="w-full max-w-3xl mx-auto bg-[#f4f3f6] font-poppins shadow-lg">
       <div className="w-full p-8 flex justify-center bg-white border-b-2 border-[#2c0e45]">
-        <div className="w-40 h-20 bg-[#f2e5d6] flex items-center justify-center text-[#2c0e45] font-bold rounded-lg font-poppins">
-          LOGO PLACEHOLDER
+        <div className="w-40 h-20 bg-white flex items-center justify-center">
+          <img 
+            src="https://storage.googleapis.com/msgsndr/P0wBME8H6tGaE7dMDT4H/media/66fac7439da07b34bd73061d.png"
+            alt="EWC Logo"
+            className="w-auto h-full object-contain"
+          />
         </div>
       </div>
       <CardHeader className="bg-[#2c0e45] text-white py-6">
