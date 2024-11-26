@@ -35,7 +35,7 @@ const serviceCategories = {
 };
 
 const packages = {
-  'Unlimited': { sessions: 12, discount: 0.25 },
+  'Unlimited': { sessions: "Unlimited - 2 Years", discount: 0.25 },
   '6 Pack': { sessions: 6, discount: 0.0 },
   '6+1 Pack': { sessions: 7, discount: 0.14 },
   'BOGO 20': { sessions: 6, discount: 0.0 }
