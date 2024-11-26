@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/components/ui/select';
-import { Button } from '@/src/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
 
 const serviceCategories = {
