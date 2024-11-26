@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 const serviceCategories = {
@@ -35,7 +35,7 @@ const serviceCategories = {
 };
 
 const packages = {
-  'Unlimited': { sessions: "Unlimited - 2 Years", discount: 0.25 },
+  'Unlimited': { sessions: 12, discount: 0.25 },
   '6 Pack': { sessions: 6, discount: 0.0 },
   '6+1 Pack': { sessions: 7, discount: 0.14 },
   'BOGO 20': { sessions: 6, discount: 0.0 }
@@ -106,31 +106,16 @@ const LaserPackageCalculator = () => {
     return (totalPackagePrice / installments).toFixed(2);
   };
 
-const getDiscountText = () => {
-  if (!selectedPackage) return '';
-  if (selectedPackage === 'BOGO 20') {
-    return selectedServices.length >= 2 ? '(20% OFF second treatment)' : '';
-  }
-  // Fix decimal places
-  return packages[selectedPackage].discount > 0 ? 
-    `(${(packages[selectedPackage].discount * 100).toFixed(0)}% OFF)` : '';
-};
+  const getDiscountText = () => {
+    if (!selectedPackage) return '';
+    if (selectedPackage === 'BOGO 20') {
+      return selectedServices.length >= 2 ? '(20% OFF second treatment)' : '';
+    }
+    return packages[selectedPackage].discount > 0 ? 
+      `(${(packages[selectedPackage].discount * 100).toFixed(0)}% OFF)` : '';
+  };
 
-// Previous imports remain the same...
-
-const getDiscountText = () => {
-  if (!selectedPackage) return '';
-  if (selectedPackage === 'BOGO 20') {
-    return selectedServices.length >= 2 ? '(20% OFF second treatment)' : '';
-  }
-  // Fix decimal places
-  return packages[selectedPackage].discount > 0 ? 
-    `(${(packages[selectedPackage].discount * 100).toFixed(0)}% OFF)` : '';
-};
-
-// ... other functions remain the same until return statement
-
-return (
+  return (
     <Card className="w-full max-w-3xl mx-auto bg-[#f4f3f6] font-sans shadow-lg">
       <div className="w-full p-8 flex justify-center bg-white border-b-2 border-[#2c0e45]">
         <div className="w-40 h-20 bg-[#f2e5d6] flex items-center justify-center text-[#2c0e45] font-bold rounded-lg">
@@ -256,8 +241,6 @@ return (
       </CardContent>
     </Card>
   );
-
-// Rest of the component remains the same
 };
 
 export default LaserPackageCalculator;
