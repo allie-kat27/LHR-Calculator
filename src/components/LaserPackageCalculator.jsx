@@ -150,9 +150,9 @@ const LaserPackageCalculator = () => {
         <div className="w-full">
           <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">SELECT PACKAGE</label>
           <Select onValueChange={setSelectedPackage}>
-            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <div className="flex items-center w-full">
-                <SelectValue placeholder="Choose your package" className="font-poppins" />
+            <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+              <div className="flex justify-between items-center w-full px-4">
+                <SelectValue placeholder="Choose your package" className="text-center flex-grow" />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto font-poppins">
@@ -188,9 +188,9 @@ const LaserPackageCalculator = () => {
           </div>
           {showServiceSelect && (
             <Select onValueChange={addService}>
-              <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-                <div className="flex items-center w-full">
-                  <SelectValue placeholder="Select treatment area" className="font-poppins" />
+              <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+                <div className="flex justify-between items-center w-full px-4">
+                  <SelectValue placeholder="Select treatment area" className="text-center flex-grow" />
                 </div>
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg overflow-y-auto max-h-[40vh] font-poppins">
@@ -232,9 +232,9 @@ const LaserPackageCalculator = () => {
         <div className="w-full">
           <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">PAYMENT PLAN</label>
           <Select onValueChange={(value) => setPayments(parseInt(value))}>
-            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <div className="flex items-center w-full">
-                <SelectValue placeholder="Select number of payments" className="font-poppins" />
+            <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+              <div className="flex justify-between items-center w-full px-4">
+                <SelectValue placeholder="Select number of payments" className="text-center flex-grow" />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg font-poppins">
@@ -252,21 +252,41 @@ const LaserPackageCalculator = () => {
         </div>
 
         {selectedPackage && selectedServices.length > 0 && (
-          <div className="mt-8 space-y-4 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg font-poppins">
-            <div className="text-xl">
-              Price Per Treatment: ${calculatePricePerTreatment()}
+          <div className="mt-8 space-y-6 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg font-poppins">
+            <div className="text-xl font-bold">
+              Total Price Per Treatment: ${calculatePricePerTreatment()}
               <span className="text-[#e91f4e] ml-2 font-bold">
                 {getDiscountText()}
               </span>
             </div>
-            <div className="text-3xl font-bold">
+            
+            <div className="space-y-4">
+              <div className="font-medium text-lg border-t border-[#2c0e45] pt-4">
+                Individual Treatment Pricing:
+              </div>
+              <div className="space-y-2 pl-4">
+                {selectedServices.map((service, index) => (
+                  <div key={index} className="text-lg flex items-start">
+                    <span className="text-[#e91f4e] mr-2">•</span>
+                    <span className="font-medium">{service.service}</span>
+                    <span className="mx-2">-</span>
+                    <span>
+                      ${(service.price * (1 - (selectedPackage === 'BOGO 20' && index === 1 ? 0.2 : packages[selectedPackage].discount))).toFixed(2)} per treatment
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-3xl font-bold border-t border-[#2c0e45] pt-4">
               Package Total: ${calculateTotal()}
               <span className="text-lg ml-2">
                 ({packages[selectedPackage].sessions} treatments)
               </span>
             </div>
+            
             {payments > 1 && (
-              <div className="text-xl border-t border-[#2c0e45] pt-4 mt-4">
+              <div className="text-xl border-t border-[#2c0e45] pt-4">
                 ${calculateTotal(payments)} per payment
               </div>
             )}
