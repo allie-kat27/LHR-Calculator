@@ -34,14 +34,25 @@ const serviceCategories = {
   }
 };
 
-const packages = {
-  'Unlimited': { sessions: 12, discount: 0.25 },
-  'Standard 6 Pack': { sessions: 6, discount: 0.0 },
-  '6+1 Pack': { sessions: 7, discount: 0.14 },
-  'BOGO 20': { sessions: 6, discount: 0.0 },
-  'Touch Up 4 Pack': { sessions: 4, discount: 0.25 },
-  'Touch Up 3 Pack': { sessions: 3, discount: 0.0 }
+const packageSections = {
+  'Standard Packages': {
+    'Standard 6 Pack': { sessions: 6, discount: 0.0 },
+    '6+1 Pack': { sessions: 7, discount: 0.14 },
+    'Unlimited': { sessions: 12, discount: 0.25 },
+  },
+  'Promotional Packages': {
+    'BOGO 20': { sessions: 6, discount: 0.0 },
+  },
+  'Touch Up Packages': {
+    'Touch Up 4 Pack': { sessions: 4, discount: 0.25 },
+    'Touch Up 3 Pack': { sessions: 3, discount: 0.0 },
+  }
 };
+
+const packages = Object.values(packageSections).reduce((acc, section) => ({
+  ...acc,
+  ...section
+}), {});
 
 const getPackageDisplayText = (name) => {
   switch (name) {
@@ -140,17 +151,26 @@ const LaserPackageCalculator = () => {
           <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">SELECT PACKAGE</label>
           <Select onValueChange={setSelectedPackage}>
             <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <SelectValue placeholder="Choose your package" className="font-poppins" />
+              <div className="flex items-center w-full">
+                <SelectValue placeholder="Choose your package" className="font-poppins" />
+              </div>
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto font-poppins">
-              {Object.keys(packages).map((name) => (
-                <SelectItem 
-                  key={name} 
-                  value={name} 
-                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins"
-                >
-                  {getPackageDisplayText(name)}
-                </SelectItem>
+              {Object.entries(packageSections).map(([sectionName, sectionPackages]) => (
+                <div key={sectionName} className="px-2 py-1">
+                  <div className="font-bold text-[#2c0e45] pb-2 border-b border-[#2c0e45] mb-1">
+                    {sectionName}
+                  </div>
+                  {Object.keys(sectionPackages).map((name) => (
+                    <SelectItem 
+                      key={name} 
+                      value={name} 
+                      className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins my-1"
+                    >
+                      {getPackageDisplayText(name)}
+                    </SelectItem>
+                  ))}
+                </div>
               ))}
             </SelectContent>
           </Select>
@@ -169,7 +189,9 @@ const LaserPackageCalculator = () => {
           {showServiceSelect && (
             <Select onValueChange={addService}>
               <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-                <SelectValue placeholder="Select treatment area" className="font-poppins" />
+                <div className="flex items-center w-full">
+                  <SelectValue placeholder="Select treatment area" className="font-poppins" />
+                </div>
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg overflow-y-auto max-h-[40vh] font-poppins">
                 {Object.entries(serviceCategories).map(([category, { services }]) => (
@@ -211,7 +233,9 @@ const LaserPackageCalculator = () => {
           <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">PAYMENT PLAN</label>
           <Select onValueChange={(value) => setPayments(parseInt(value))}>
             <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <SelectValue placeholder="Select number of payments" className="font-poppins" />
+              <div className="flex items-center w-full">
+                <SelectValue placeholder="Select number of payments" className="font-poppins" />
+              </div>
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg font-poppins">
               {[1, 2, 3, 4, 5, 6].map((num) => (
