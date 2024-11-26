@@ -116,28 +116,28 @@ const LaserPackageCalculator = () => {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-[#f4f3f6] font-sans shadow-lg">
+    <Card className="w-full max-w-3xl mx-auto bg-[#f4f3f6] font-poppins shadow-lg">
       <div className="w-full p-8 flex justify-center bg-white border-b-2 border-[#2c0e45]">
-        <div className="w-40 h-20 bg-[#f2e5d6] flex items-center justify-center text-[#2c0e45] font-bold rounded-lg">
+        <div className="w-40 h-20 bg-[#f2e5d6] flex items-center justify-center text-[#2c0e45] font-bold rounded-lg font-poppins">
           LOGO PLACEHOLDER
         </div>
       </div>
       <CardHeader className="bg-[#2c0e45] text-white py-6">
-        <CardTitle className="text-2xl text-center font-bold">EWC Laser Hair Removal Package Calculator</CardTitle>
+        <CardTitle className="text-2xl text-center font-bold font-poppins">EWC Laser Hair Removal Package Calculator</CardTitle>
       </CardHeader>
       <CardContent className="p-8 space-y-8">
         <div className="w-full">
-          <label className="block text-base font-bold mb-3 text-[#2c0e45]">SELECT PACKAGE</label>
+          <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">SELECT PACKAGE</label>
           <Select onValueChange={setSelectedPackage}>
-            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white">
-              <SelectValue placeholder="Choose your package" />
+            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+              <SelectValue placeholder="Choose your package" className="font-poppins" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
+            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto font-poppins">
               {Object.keys(packages).map((name) => (
                 <SelectItem 
                   key={name} 
                   value={name} 
-                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded"
+                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins"
                 >
                   {getPackageDisplayText(name)}
                 </SelectItem>
@@ -148,20 +148,20 @@ const LaserPackageCalculator = () => {
 
         <div className="w-full">
           <div className="flex items-center justify-between mb-3">
-            <label className="block text-base font-bold text-[#2c0e45]">TREATMENT AREAS</label>
+            <label className="block text-base font-bold text-[#2c0e45] font-poppins">TREATMENT AREAS</label>
             <Button 
               onClick={() => setShowServiceSelect(true)}
-              className="bg-[#e91f4e] hover:bg-[#c41840] text-white flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
+              className="bg-[#e91f4e] hover:bg-[#c41840] text-white flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg font-poppins"
             >
               <Plus size={20} className="rounded-full" /> Add Service
             </Button>
           </div>
           {showServiceSelect && (
             <Select onValueChange={addService}>
-              <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white">
-                <SelectValue placeholder="Select treatment area" />
+              <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+                <SelectValue placeholder="Select treatment area" className="font-poppins" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
+              <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg overflow-y-auto max-h-[40vh] font-poppins">
                 {Object.entries(serviceCategories).map(([category, { services }]) => (
                   <div key={category} className="p-2">
                     <div className="font-bold text-[#2c0e45] pb-2 border-b border-[#2c0e45]">{category}</div>
@@ -169,7 +169,7 @@ const LaserPackageCalculator = () => {
                       <SelectItem 
                         key={service} 
                         value={service}
-                        className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded mt-1"
+                        className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded mt-1 font-poppins"
                       >
                         {service}
                       </SelectItem>
@@ -184,12 +184,12 @@ const LaserPackageCalculator = () => {
         <div className="space-y-3 w-full">
           {selectedServices.map((item, index) => (
             <div key={index} className="flex justify-between items-center bg-white p-4 rounded-lg border-2 border-[#2c0e45] shadow-sm">
-              <span className="font-medium text-[#2c0e45]">
+              <span className="font-medium text-[#2c0e45] font-poppins">
                 {item.service} - ${item.price}
               </span>
               <Button 
                 onClick={() => removeService(index)}
-                className="bg-[#e91f4e] hover:bg-[#c41840] text-white px-4 py-2 rounded-full transition-all duration-200"
+                className="bg-[#e91f4e] hover:bg-[#c41840] text-white px-4 py-2 rounded-full transition-all duration-200 font-poppins"
               >
                 Remove
               </Button>
@@ -198,17 +198,17 @@ const LaserPackageCalculator = () => {
         </div>
 
         <div className="w-full">
-          <label className="block text-base font-bold mb-3 text-[#2c0e45]">PAYMENT PLAN</label>
+          <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">PAYMENT PLAN</label>
           <Select onValueChange={(value) => setPayments(parseInt(value))}>
-            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white">
-              <SelectValue placeholder="Select number of payments" />
+            <SelectTrigger className="border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
+              <SelectValue placeholder="Select number of payments" className="font-poppins" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
+            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg font-poppins">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <SelectItem 
                   key={num} 
                   value={num}
-                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded"
+                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins"
                 >
                   {num} {num === 1 ? 'Payment' : 'Payments'}
                 </SelectItem>
@@ -218,7 +218,7 @@ const LaserPackageCalculator = () => {
         </div>
 
         {selectedPackage && selectedServices.length > 0 && (
-          <div className="mt-8 space-y-4 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg">
+          <div className="mt-8 space-y-4 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg font-poppins">
             <div className="text-xl">
               Price Per Treatment: ${calculatePricePerTreatment()}
               <span className="text-[#e91f4e] ml-2 font-bold">
