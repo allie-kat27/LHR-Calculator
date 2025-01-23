@@ -5,76 +5,43 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 const serviceCategories = {
-  'Extra Small - $75': {
+  'Extra Small': {
     price: 75,
-    services: [
-      'Cheeks', 'Chin', 'Ears', 'Eyebrow (Between Brows)', 'Hairline',
-      'Hands', 'Lip (Lower or Upper)', 'Nipple', 'Sideburns',
-      'Stomach Strip', 'Toes'
-    ]
+    services: ['Cheeks', 'Chin', 'Ears', 'Eyebrow (Between Brows)', 'Hairline',
+    'Hands', 'Lip (Lower or Upper)', 'Nipple', 'Sideburns', 'Stomach Strip', 'Toes']
   },
-  'Small - $125': {
+  'Small': {
     price: 125,
-    services: [
-      'Back (Upper)', 'Back (Mid)', 'Back (Lower)', 'Bikini Line',
-      'Butt Strip', 'Chest Strip', 'Inner Thigh', 'Neck',
-      'Stomach (Full)', 'Underarms'
-    ]
+    services: ['Back (Upper)', 'Back (Mid)', 'Back (Lower)', 'Bikini Line',
+    'Butt Strip', 'Chest Strip', 'Inner Thigh', 'Neck', 'Stomach (Full)', 'Underarms']
   },
-  'Medium - $200': {
+  'Medium': {
     price: 200,
-    services: [
-      'Arms (Half)', 'Bikini Brazilian', 'Bikini Full', 'Full Butt',
-      'Full Face', 'Leg Upper', 'Leg Lower', 'Shoulders'
-    ]
+    services: ['Arms (Half)', 'Bikini Brazilian', 'Bikini Full', 'Full Butt',
+    'Full Face', 'Leg Upper', 'Leg Lower', 'Shoulders']
   },
-  'Large - $300': {
+  'Large': {
     price: 300,
     services: ['Full Chest', 'Full Arms', 'Full Back', 'Full Legs']
   }
 };
 
-const packageSections = {
-  'Standard Packages': {
-    'Standard 6 Pack': { sessions: 6, discount: 0.0 },
-    '6+1 Pack': { sessions: 7, discount: 0.14 },
-    'Unlimited': { sessions: 12, discount: 0.25 },
-  },
-  'Promotional Packages': {
-    'BOGO 20': { sessions: 6, discount: 0.0 },
-  },
-  'Touch Up Packages': {
-    'Touch Up 4 Pack': { sessions: 4, discount: 0.25 },
-    'Touch Up 3 Pack': { sessions: 3, discount: 0.0 },
-  }
+const packageTypes = {
+  'Standard 6': { sessions: 6, discount: 0.0 },
+  '6+1 Standard': { sessions: 7, discount: 0.14 },
+  'Unlimited': { sessions: 12, discount: 0.25 },
+  'Touch Up 3': { sessions: 3, discount: 0.0 },
+  'Touch Up 3+1': { sessions: 4, discount: 0.0 }
 };
 
-const packages = Object.values(packageSections).reduce((acc, section) => ({
-  ...acc,
-  ...section
-}), {});
-
-const getPackageDisplayText = (name) => {
-  switch (name) {
-    case 'Unlimited':
-      return 'Unlimited - 2 Years (25% off)';
-    case '6+1 Pack':
-      return '6+1 Pack (14% off)';
-    case 'BOGO 20':
-      return 'BOGO 20 - Buy One Get One 20% Off';
-    case 'Touch Up 4 Pack':
-      return 'Touch Up 4 Pack (25% off)';
-    case 'Touch Up 3 Pack':
-      return 'Touch Up 3 Pack';
-    default:
-      return 'Standard 6 Pack';
-  }
-};
+const locations = [
+  { name: 'Queens', taxRate: 0.045 },
+  { name: 'Long Island', taxRate: 0 }
+];
 
 const LaserPackageCalculator = () => {
   const [selectedServices, setSelectedServices] = useState([]);
-  const [selectedPackage, setSelectedPackage] = useState(null);
-  const [payments, setPayments] = useState(1);
+  const [location, setLocation] = useState(null);
   const [showServiceSelect, setShowServiceSelect] = useState(false);
 
   const findServiceCategory = (serviceName) => {
@@ -86,50 +53,79 @@ const LaserPackageCalculator = () => {
     return null;
   };
 
-  const addService = (serviceName) => {
-    const categoryInfo = findServiceCategory(serviceName);
-    if (categoryInfo) {
-      setSelectedServices([...selectedServices, {
-        service: serviceName,
-        price: categoryInfo.price,
-        category: categoryInfo.category
-      }]);
-      setShowServiceSelect(false);
-    }
+  const addService = () => {
+    setSelectedServices([...selectedServices, {
+      service: null,
+      packageType: null,
+      paymentPlan: null,
+      price: 0
+    }]);
+    setShowServiceSelect(true);
   };
 
   const removeService = (index) => {
     setSelectedServices(selectedServices.filter((_, i) => i !== index));
   };
 
-  const calculatePricePerTreatment = () => {
-    if (!selectedPackage) return 0;
-    const baseTotal = selectedServices.reduce((sum, item) => sum + item.price, 0);
+  const updateService = (index, field, value) => {
+    const newServices = [...selectedServices];
+    newServices[index] = {
+      ...newServices[index],
+      [field]: value
+    };
     
-    if (selectedPackage === 'BOGO 20' && selectedServices.length >= 2) {
-      const sortedPrices = selectedServices.map(item => item.price).sort((a, b) => b - a);
-      const totalWithDiscount = sortedPrices[0] + (sortedPrices[1] * 0.8) + 
-        sortedPrices.slice(2).reduce((sum, price) => sum + price, 0);
-      return totalWithDiscount.toFixed(2);
+    if (field === 'service') {
+      const categoryInfo = findServiceCategory(value);
+      if (categoryInfo) {
+        newServices[index].price = categoryInfo.price;
+      }
     }
     
-    return (baseTotal * (1 - packages[selectedPackage].discount)).toFixed(2);
-  };
-
-  const calculateTotal = (installments = 1) => {
-    if (!selectedPackage) return 0;
-    const pricePerTreatment = parseFloat(calculatePricePerTreatment());
-    const totalPackagePrice = pricePerTreatment * packages[selectedPackage].sessions;
-    return (totalPackagePrice / installments).toFixed(2);
-  };
-
-  const getDiscountText = () => {
-    if (!selectedPackage) return '';
-    if (selectedPackage === 'BOGO 20') {
-      return selectedServices.length >= 2 ? '(20% OFF second treatment)' : '';
+    if (field === 'packageType' && value.includes('Touch Up')) {
+      if (newServices[index].paymentPlan && parseInt(newServices[index].paymentPlan) > 2) {
+        newServices[index].paymentPlan = '1';
+      }
     }
-    return packages[selectedPackage].discount > 0 ? 
-      `(${(packages[selectedPackage].discount * 100).toFixed(0)}% OFF)` : '';
+    
+    setSelectedServices(newServices);
+  };
+
+  const getAvailablePaymentPlans = (packageType) => {
+    if (!packageType) return [];
+    if (packageType.includes('Touch Up')) {
+      return [
+        { value: '1', label: 'Upfront' },
+        { value: '2', label: '2 installments' }
+      ];
+    }
+    return [
+      { value: '1', label: 'Upfront' },
+      { value: '2', label: '2 installments' },
+      { value: '4', label: '4 installments' },
+      { value: '6', label: '6 installments' }
+    ];
+  };
+
+  const calculateServiceTotal = (service) => {
+    if (!service.service || !service.packageType || !service.paymentPlan) return 0;
+    const basePrice = service.price;
+    const packageInfo = packageTypes[service.packageType];
+    const discountedPrice = basePrice * (1 - packageInfo.discount);
+    return discountedPrice * packageInfo.sessions;
+  };
+
+  const calculateSubtotal = () => {
+    return selectedServices.reduce((sum, service) => sum + calculateServiceTotal(service), 0);
+  };
+
+  const calculateTax = () => {
+    if (!location) return 0;
+    const loc = locations.find(l => l.name === location);
+    return loc ? calculateSubtotal() * loc.taxRate : 0;
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + calculateTax();
   };
 
   return (
@@ -143,153 +139,152 @@ const LaserPackageCalculator = () => {
           />
         </div>
       </div>
+
       <CardHeader className="bg-[#2c0e45] text-white py-6">
         <CardTitle className="text-2xl text-center font-bold font-poppins">EWC Laser Hair Removal Package Calculator</CardTitle>
       </CardHeader>
-      <CardContent className="p-8 space-y-8">
-        <div className="w-full">
-          <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">SELECT PACKAGE</label>
-          <Select onValueChange={setSelectedPackage}>
-            <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <div className="flex justify-between items-center w-full px-4">
-                <SelectValue placeholder="Choose your package" className="text-center flex-grow" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto font-poppins">
-              {Object.entries(packageSections).map(([sectionName, sectionPackages]) => (
-                <div key={sectionName} className="px-2 py-1">
-                  <div className="font-bold text-[#2c0e45] pb-2 border-b border-[#2c0e45] mb-1">
-                    {sectionName}
-                  </div>
-                  {Object.keys(sectionPackages).map((name) => (
-                    <SelectItem 
-                      key={name} 
-                      value={name} 
-                      className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins my-1"
-                    >
-                      {getPackageDisplayText(name)}
-                    </SelectItem>
-                  ))}
-                </div>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
 
-        <div className="w-full">
+      <CardContent className="p-8 space-y-8">
+        <div>
           <div className="flex items-center justify-between mb-3">
-            <label className="block text-base font-bold text-[#2c0e45] font-poppins">TREATMENT AREAS</label>
+            <label className="block text-base font-bold text-[#2c0e45] font-poppins">TREATMENT AREA(S)</label>
             <Button 
-              onClick={() => setShowServiceSelect(true)}
+              onClick={addService}
               className="bg-[#e91f4e] hover:bg-[#c41840] text-white flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-lg font-poppins"
             >
               <Plus size={20} className="rounded-full" /> Add Service
             </Button>
           </div>
-          {showServiceSelect && (
-            <Select onValueChange={addService}>
-              <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-                <div className="flex justify-between items-center w-full px-4">
-                  <SelectValue placeholder="Select treatment area" className="text-center flex-grow" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg overflow-y-auto max-h-[40vh] font-poppins">
-                {Object.entries(serviceCategories).map(([category, { services }]) => (
-                  <div key={category} className="p-2">
-                    <div className="font-bold text-[#2c0e45] pb-2 border-b border-[#2c0e45]">{category}</div>
-                    {services.map((service) => (
-                      <SelectItem 
-                        key={service} 
-                        value={service}
-                        className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded mt-1 font-poppins"
-                      >
-                        {service}
-                      </SelectItem>
-                    ))}
+
+          <div className="space-y-6">
+            {selectedServices.map((service, index) => (
+              <div key={index} className="p-4 bg-white rounded-lg border-2 border-[#2c0e45] space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 space-y-4">
+                    <Select 
+                      value={service.service}
+                      onValueChange={(value) => updateService(index, 'service', value)}
+                    >
+                      <SelectTrigger className="border-2 border-[#2c0e45] h-12">
+                        <SelectValue placeholder="Select treatment area" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {Object.entries(serviceCategories).map(([category, { services }]) => (
+                          <div key={category} className="p-2">
+                            <div className="font-bold text-[#2c0e45] pb-2 border-b border-[#2c0e45]">{category}</div>
+                            {services.map((serviceName) => (
+                              <SelectItem 
+                                key={serviceName} 
+                                value={serviceName}
+                                className="cursor-pointer hover:bg-[#f4f3f6] py-2"
+                              >
+                                {serviceName}
+                              </SelectItem>
+                            ))}
+                          </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={service.packageType}
+                      onValueChange={(value) => updateService(index, 'packageType', value)}
+                    >
+                      <SelectTrigger className="border-2 border-[#2c0e45] h-12">
+                        <SelectValue placeholder="Select package type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(packageTypes).map(([type, info]) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={service.paymentPlan}
+                      onValueChange={(value) => updateService(index, 'paymentPlan', value)}
+                    >
+                      <SelectTrigger className="border-2 border-[#2c0e45] h-12">
+                        <SelectValue placeholder="Select payment plan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailablePaymentPlans(service.packageType).map((plan) => (
+                          <SelectItem key={plan.value} value={plan.value}>
+                            {plan.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
 
-        <div className="space-y-3 w-full">
-          {selectedServices.map((item, index) => (
-            <div key={index} className="flex justify-between items-center bg-white p-4 rounded-lg border-2 border-[#2c0e45] shadow-sm">
-              <span className="font-medium text-[#2c0e45] font-poppins">
-                {item.service} - ${item.price}
-              </span>
-              <Button 
-                onClick={() => removeService(index)}
-                className="bg-[#e91f4e] hover:bg-[#c41840] text-white px-4 py-2 rounded-full transition-all duration-200 font-poppins"
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-        </div>
+                  <Button 
+                    onClick={() => removeService(index)}
+                    className="bg-[#e91f4e] hover:bg-[#c41840] text-white ml-4"
+                  >
+                    Remove
+                  </Button>
+                </div>
 
-        <div className="w-full">
-          <label className="block text-base font-bold mb-3 text-[#2c0e45] font-poppins">PAYMENT PLAN</label>
-          <Select onValueChange={(value) => setPayments(parseInt(value))}>
-            <SelectTrigger className="relative border-2 border-[#2c0e45] h-12 w-full rounded-lg bg-white font-poppins">
-              <div className="flex justify-between items-center w-full px-4">
-                <SelectValue placeholder="Select number of payments" className="text-center flex-grow" />
+                {service.service && service.packageType && service.paymentPlan && (
+                  <div className="pt-4 border-t border-[#2c0e45] space-y-2">
+                    <div className="flex justify-between text-[#2c0e45]">
+                      <span>Package Price:</span>
+                      <span>${calculateServiceTotal(service).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-[#2c0e45]">
+                      <span>Per Treatment:</span>
+                      <span>${(calculateServiceTotal(service) / packageTypes[service.packageType].sessions).toFixed(2)}</span>
+                    </div>
+                    {service.paymentPlan !== '1' && (
+                      <div className="flex justify-between text-[#2c0e45]">
+                        <span>Per Payment:</span>
+                        <span>${(calculateServiceTotal(service) / parseInt(service.paymentPlan)).toFixed(2)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-base font-bold mb-3 text-[#2c0e45]">LOCATION</label>
+          <Select value={location} onValueChange={setLocation}>
+            <SelectTrigger className="border-2 border-[#2c0e45] h-12">
+              <SelectValue placeholder="Select location" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg font-poppins">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
-                <SelectItem 
-                  key={num} 
-                  value={num}
-                  className="text-[#2c0e45] p-2 hover:bg-[#f4f3f6] cursor-pointer rounded font-poppins"
-                >
-                  {num} {num === 1 ? 'Payment' : 'Payments'}
+            <SelectContent>
+              {locations.map((loc) => (
+                <SelectItem key={loc.name} value={loc.name}>
+                  {loc.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {selectedPackage && selectedServices.length > 0 && (
-          <div className="mt-8 space-y-6 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg font-poppins">
-            <div className="text-xl font-bold">
-              Total Price Per Treatment: ${calculatePricePerTreatment()}
-              <span className="text-[#e91f4e] ml-2 font-bold">
-                {getDiscountText()}
-              </span>
+        {selectedServices.length > 0 && location && (
+          <div className="mt-8 space-y-4 bg-white p-6 rounded-lg text-[#2c0e45] border-2 border-[#2c0e45] shadow-lg">
+            <div className="text-xl font-bold border-b border-[#2c0e45] pb-4">
+              Summary
             </div>
-            
-            <div className="space-y-4">
-              <div className="font-medium text-lg border-t border-[#2c0e45] pt-4">
-                Individual Treatment Pricing:
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
-              <div className="space-y-2 pl-4">
-                {selectedServices.map((service, index) => (
-                  <div key={index} className="text-lg flex items-start">
-                    <span className="text-[#e91f4e] mr-2">•</span>
-                    <span className="font-medium">{service.service}</span>
-                    <span className="mx-2">-</span>
-                    <span>
-                      ${(service.price * (1 - (selectedPackage === 'BOGO 20' && index === 1 ? 0.2 : packages[selectedPackage].discount))).toFixed(2)} per treatment
-                    </span>
-                  </div>
-                ))}
+              <div className="flex justify-between">
+                <span>Tax ({location === 'Queens' ? '4.5%' : '0%'}):</span>
+                <span>${calculateTax().toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-xl font-bold pt-4 border-t border-[#2c0e45]">
+                <span>Total:</span>
+                <span>${calculateTotal().toFixed(2)}</span>
               </div>
             </div>
-
-            <div className="text-3xl font-bold border-t border-[#2c0e45] pt-4">
-              Package Total: ${calculateTotal()}
-              <span className="text-lg ml-2">
-                ({packages[selectedPackage].sessions} treatments)
-              </span>
-            </div>
-            
-            {payments > 1 && (
-              <div className="text-xl border-t border-[#2c0e45] pt-4">
-                ${calculateTotal(payments)} per payment
-              </div>
-            )}
           </div>
         )}
       </CardContent>
