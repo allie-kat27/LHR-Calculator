@@ -164,39 +164,38 @@ const LaserPackageCalculator = () => {
               <Plus size={20} /> Add Treatment Area
             </Button>
           </div>
+         {showServiceSelect && (
+           <div className="w-full bg-white rounded-lg border-2 border-[#2c0e45] p-4">
+             <Select onValueChange={addService}>
+               <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                 <div className="flex justify-between items-center w-full px-4">
+                   <SelectValue placeholder="Select treatment area" className="text-[#2c0e45]" />
+                 </div>
+               </SelectTrigger>
+               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
+                 {Object.entries(serviceCategories).map(([category, { services }]) => (
+                   <div key={category} className="p-4">
+                     <div className="font-bold text-[#2c0e45] pb-2 mb-2 border-b border-[#2c0e45]">
+                       {category}
+                     </div>
+                     {services.map((service) => (
+                       <SelectItem 
+                         key={service} 
+                         value={service}
+                         className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg my-1"
+                       >
+                         {service}
+                       </SelectItem>
+                     ))}
+                   </div>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
+         )}
 
-          {showServiceSelect && (
-            <div className="w-full bg-white rounded-lg border-2 border-[#2c0e45] p-4">
-              <Select onValueChange={addService}>
-                <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                  <div className="flex justify-between items-center w-full px-4">
-                    <SelectValue placeholder="Select treatment area" className="text-[#2c0e45]" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
-                  {Object.entries(serviceCategories).map(([category, { services }]) => (
-                    <div key={category} className="p-4">
-                      <div className="font-bold text-[#2c0e45] pb-2 mb-2 border-b border-[#2c0e45]">
-                        {category}
-                      </div>
-                      {services.map((service) => (
-                        <SelectItem 
-                          key={service} 
-                          value={service}
-                          className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg my-1"
-                        >
-                          {service}
-                        </SelectItem>
-                      ))}
-                    </div>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* Selected Services List */}
-          <div className="space-y-4">
+         {/* Selected Services List */}
+         <div className="space-y-4">
            {services.map((service, index) => (
              <div key={index} className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
                <div className="flex justify-between items-center mb-4">
@@ -235,59 +234,61 @@ const LaserPackageCalculator = () => {
          </div>
        </div>
 
-        {/* Payment Plan Selection */}
-        {isReadyForPayment() && (
-          <div className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
-            <label className="block text-lg font-bold mb-4 text-[#2c0e45]">
-              SELECT PAYMENT PLAN
-            </label>
-            <Select onValueChange={(value) => setPayments(parseInt(value))}>
-              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                <div className="flex justify-between items-center w-full px-4">
-                  <SelectValue placeholder="Select payment plan" className="text-[#2c0e45]" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
-                {getAvailablePaymentOptions().map((option) => (
-                  <SelectItem 
-                    key={option.value} 
-                    value={option.value}
-                    className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+       {/* Payment Plan Selection */}
+       {isReadyForPayment() && (
+         <div className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
+           <label className="block text-lg font-bold mb-4 text-[#2c0e45]">
+             SELECT PAYMENT PLAN
+           </label>
+           <Select onValueChange={(value) => setPayments(parseInt(value))}>
+             <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+               <div className="flex justify-between items-center w-full px-4">
+                 <SelectValue placeholder="Select payment plan" className="text-[#2c0e45]" />
+               </div>
+             </SelectTrigger>
+             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
+               {getAvailablePaymentOptions().map((option) => (
+                 <SelectItem 
+                   key={option.value} 
+                   value={option.value}
+                   className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
+                 >
+                   {option.label}
+                 </SelectItem>
+               ))}
+             </SelectContent>
+           </Select>
+         </div>
+       )}
 
-        {/* Location Selection */}
-        {payments && (
-          <div className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
-            <label className="block text-lg font-bold mb-4 text-[#2c0e45]">
-              SELECT LOCATION
-            </label>
-            <Select onValueChange={setLocation}>
-              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                <div className="flex justify-between items-center w-full px-4">
-                  <SelectValue placeholder="Select location" className="text-[#2c0e45]" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
-                {locations.map((loc) => (
-                  <SelectItem 
-                    key={loc.name} 
-                    value={loc.name}
-                    className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
-                  >
-                    {loc.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+       {/* Location Selection */}
+       {payments && (
+         <div className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
+           <label className="block text-lg font-bold mb-4 text-[#2c0e45]">
+             SELECT LOCATION
+           </label>
+           <Select onValueChange={setLocation}>
+             <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+               <div className="flex justify-between items-center w-full px-4">
+                 <SelectValue placeholder="Select location" className="text-[#2c0e45]" />
+               </div>
+             </SelectTrigger>
+             <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
+               {locations.map((loc) => (
+                 <SelectItem 
+                   key={loc.name} 
+                   value={loc.name}
+                   className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
+                 >
+                   {loc.name}
+                 </SelectItem>
+               ))}
+             </SelectContent>
+           </Select>
+         </div>
+       )}
+
+       
 
         {/* Price Summary */}
         {location && payments && (
