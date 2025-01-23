@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+'use client';
 
 const serviceCategories = {
   'Extra Small': {
@@ -196,43 +197,43 @@ const LaserPackageCalculator = () => {
 
           {/* Selected Services List */}
           <div className="space-y-4">
-            {services.map((service, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-medium text-[#2c0e45]">{service.service}</span>
-                  <Button 
-                    onClick={() => removeService(index)}
-                    className="bg-[#e91f4e] hover:bg-[#c41840] text-white px-6 py-2 rounded-full"
-                  >
-                    Remove
-                  </Button>
-                </div>
+           {services.map((service, index) => (
+             <div key={index} className="bg-white p-6 rounded-lg border-2 border-[#2c0e45]">
+               <div className="flex justify-between items-center mb-4">
+                 <span className="text-lg font-medium text-[#2c0e45]">{service.service}</span>
+                 <Button 
+                   onClick={() => removeService(index)}
+                   className="bg-[#e91f4e] hover:bg-[#c41840] text-white px-6 py-2 rounded-full"
+                 >
+                   Remove
+                 </Button>
+               </div>
 
-                <Select
-                  value={service.packageType}
-                  onValueChange={(value) => updateService(index, value)}
-                >
-                  <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                    <div className="flex justify-between items-center w-full px-4">
-                      <SelectValue placeholder="Select package type" className="text-[#2c0e45]" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg">
-                    {Object.keys(packageTypes).map((type) => (
-                      <SelectItem 
-                        key={type} 
-                        value={type}
-                        className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
-                      >
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
-          </div>
-        </div>
+               <Select
+                 value={service.packageType}
+                 onValueChange={(value) => updateService(index, value)}
+               >
+                 <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                   <div className="flex justify-between items-center w-full px-4">
+                     <SelectValue placeholder="Select package type" className="text-[#2c0e45]" />
+                   </div>
+                 </SelectTrigger>
+                 <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
+                   {Object.keys(packageTypes).map((type) => (
+                     <SelectItem 
+                       key={type} 
+                       value={type}
+                       className="text-[#2c0e45] p-3 hover:bg-[#f4f3f6] cursor-pointer rounded-lg"
+                     >
+                       {type}
+                     </SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+             </div>
+           ))}
+         </div>
+       </div>
 
         {/* Payment Plan Selection */}
         {isReadyForPayment() && (
