@@ -222,17 +222,13 @@ const LaserPackageCalculator = () => {
                   </Button>
                 </div>
 
-               <div className="space-y-2">
-                  <label className="block text-lg font-bold text-[#2c0e45]">
-                    PACKAGE TYPE
-                  </label>
-                  <Select
-                    value={service.packageType}
-                    onValueChange={(value) => updateService(index, value)}
-                  >
-                    <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                      <SelectValue placeholder="Select package type" />
-                    </SelectTrigger>
+                <Select
+                  value={service.packageType}
+                  onValueChange={(value) => updateService(index, value)}
+                >
+                  <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                    <SelectValue defaultValue={service.packageType} placeholder="Select package type" />
+                  </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                     {Object.keys(packageTypes).map((type) => (
                       <SelectItem 
