@@ -260,10 +260,8 @@ const LaserPackageCalculator = () => {
               SELECT PAYMENT PLAN
             </label>
             <Select onValueChange={(value) => setPayments(parseInt(value))}>
-              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                <div className="flex justify-between items-center w-full px-4">
-                  <SelectValue placeholder="Select payment plan" className="text-[#2c0e45]" />
-                </div>
+               <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                <SelectValue placeholder="Select treatment area" className="text-[#2c0e45]" />
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                 {paymentOptions.map((option) => (
