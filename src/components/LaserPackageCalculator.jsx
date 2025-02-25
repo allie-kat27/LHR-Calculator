@@ -112,29 +112,40 @@ const LaserPackageCalculator = () => {
     return service.price * packageInfo.sessions;
   };
 
-  const calculatePricePerTreatment = (service, allServices) => {
+  const calculateServiceTotal = (service, allServices) => {
     if (!service.packageType) return 0;
     const packageInfo = packageTypes[service.packageType];
-    const total = calculateServiceTotal(service, allServices);
-    return total / packageInfo.sessions;
+    
+    if (service.packageType === 'BOGO 20') {
+      const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
+      
+      if (bogoServices.length >= 2) {
+        // Sort services by price (highest first)
+        const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
+        
+        // First service is full price, all others get 20% off
+        const isHighestPrice = sortedServices[0].service === service.service && 
+                               sortedServices.findIndex(s => s.service === service.service) === 
+                               bogoServices.findIndex(s => s.service === service.service);
+        
+        if (isHighestPrice) {
+          return service.price * 6; // Full price for highest
+        } else {
+          return service.price * 6 * 0.8; // 20% off other services
+        }
+      } else {
+        // If only one BOGO service, charge full price
+        return service.price * 6;
+      }
+    } else if (service.packageType === 'Unlimited') {
+      return service.price * packageInfo.sessions * (1 - packageInfo.discount);
+    } else if (packageInfo.totalMultiplier) {
+      return service.price * packageInfo.totalMultiplier;
+    }
+    
+    return service.price * packageInfo.sessions;
   };
-
-  const calculatePaymentAmount = (service, allServices) => {
-    if (!payments) return 0;
-    const total = calculateServiceTotal(service, allServices);
-    return total / payments;
-  };
-
-  const calculateSubtotal = () => {
-    return services.reduce((sum, service) => sum + calculateServiceTotal(service, services), 0);
-  };
-
-  const calculateTax = () => {
-    if (!location) return 0;
-    const loc = locations.find(l => l.name === location);
-    return calculateSubtotal() * loc.taxRate;
-  };
-
+  
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
