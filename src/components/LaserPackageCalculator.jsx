@@ -90,32 +90,6 @@ const LaserPackageCalculator = () => {
     if (!service.packageType) return 0;
     const packageInfo = packageTypes[service.packageType];
     
-    if (service.packageType === 'BOGO 20' && allServices.filter(s => s.packageType === 'BOGO 20').length >= 2) {
-      // For BOGO 20, we need to handle the special pricing logic
-      // This is simplified - in a real implementation, you'd want to identify
-      // which service is the highest priced one
-      const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
-      const prices = bogoServices.map(s => s.price);
-      const highestPrice = Math.max(...prices);
-      
-      if (service.price === highestPrice && bogoServices.find(s => s.service === service.service) === service) {
-        return service.price * 6; // Full price for highest
-      } else {
-        return service.price * 6 * 0.8; // 20% off other services
-      }
-    } else if (service.packageType === 'Unlimited') {
-      return service.price * packageInfo.sessions * (1 - packageInfo.discount);
-    } else if (packageInfo.totalMultiplier) {
-      return service.price * packageInfo.totalMultiplier;
-    }
-    
-    return service.price * packageInfo.sessions;
-  };
-
-  const calculateServiceTotal = (service, allServices) => {
-    if (!service.packageType) return 0;
-    const packageInfo = packageTypes[service.packageType];
-    
     if (service.packageType === 'BOGO 20') {
       const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
       
@@ -124,9 +98,9 @@ const LaserPackageCalculator = () => {
         const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
         
         // First service is full price, all others get 20% off
-        const isHighestPrice = sortedServices[0].service === service.service && 
-                               sortedServices.findIndex(s => s.service === service.service) === 
-                               bogoServices.findIndex(s => s.service === service.service);
+        const isHighestPrice = sortedServices[0].service === service.service &&
+                              sortedServices.findIndex(s => s.service === service.service) ===
+                              bogoServices.findIndex(s => s.service === service.service);
         
         if (isHighestPrice) {
           return service.price * 6; // Full price for highest
@@ -145,7 +119,30 @@ const LaserPackageCalculator = () => {
     
     return service.price * packageInfo.sessions;
   };
-  
+
+  const calculatePricePerTreatment = (service, allServices) => {
+    if (!service.packageType) return 0;
+    const packageInfo = packageTypes[service.packageType];
+    const total = calculateServiceTotal(service, allServices);
+    return total / packageInfo.sessions;
+  };
+
+  const calculatePaymentAmount = (service, allServices) => {
+    if (!payments) return 0;
+    const total = calculateServiceTotal(service, allServices);
+    return total / payments;
+  };
+
+  const calculateSubtotal = () => {
+    return services.reduce((sum, service) => sum + calculateServiceTotal(service, services), 0);
+  };
+
+  const calculateTax = () => {
+    if (!location) return 0;
+    const loc = locations.find(l => l.name === location);
+    return calculateSubtotal() * loc.taxRate;
+  };
+
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
@@ -186,7 +183,7 @@ const LaserPackageCalculator = () => {
           {showServiceSelect && (
             <div className="w-full bg-white rounded-lg border-2 border-[#2c0e45] p-4">
               <Select onValueChange={addService}>
-                <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg select-trigger">
+                <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
                   <SelectValue placeholder="Select treatment area" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
@@ -230,9 +227,7 @@ const LaserPackageCalculator = () => {
                   onValueChange={(value) => updateService(index, value)}
                 >
                   <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                    <div className="flex justify-between items-center w-full px-4">
-                      <SelectValue placeholder="Select package type" className="text-[#2c0e45]" />
-                    </div>
+                    <SelectValue placeholder="Select package type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                     {Object.keys(packageTypes).map((type) => (
@@ -258,8 +253,8 @@ const LaserPackageCalculator = () => {
               SELECT PAYMENT PLAN
             </label>
             <Select onValueChange={(value) => setPayments(parseInt(value))}>
-               <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                <SelectValue placeholder="Select treatment area" className="text-[#2c0e45]" />
+              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                <SelectValue placeholder="Select payment plan" />
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                 {paymentOptions.map((option) => (
@@ -284,9 +279,7 @@ const LaserPackageCalculator = () => {
             </label>
             <Select onValueChange={setLocation}>
               <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                <div className="flex justify-between items-center w-full px-4">
-                  <SelectValue placeholder="Select location" className="text-[#2c0e45]" />
-                </div>
+                <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                 {locations.map((loc) => (
@@ -323,7 +316,8 @@ const LaserPackageCalculator = () => {
                     <span className="font-medium">{service.service}:</span> 
                     <span className="text-[#e91f4e] font-bold"> ${calculateServiceTotal(service, services).toFixed(2)}</span>
                     {service.packageType === 'BOGO 20' && services.filter(s => s.packageType === 'BOGO 20').length >= 2 && 
-                     service.price !== Math.max(...services.filter(s => s.packageType === 'BOGO 20').map(s => s.price)) && (
+                     service !== services.filter(s => s.packageType === 'BOGO 20')
+                                          .sort((a, b) => b.price - a.price)[0] && (
                       <span className="text-[#e91f4e] text-sm ml-1">(20% off)</span>
                     )}
                   </div>
