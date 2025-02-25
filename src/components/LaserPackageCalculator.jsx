@@ -48,18 +48,104 @@ const paymentOptions = [
   { value: 6, label: '6 installments' }
 ];
 
-// Custom inline style for select trigger component to fix alignment
-const selectTriggerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '0 12px',
-  width: '100%',
-  height: '48px'
-};
-
 const LaserPackageCalculator = () => {
-  // All state and calculation functions remain unchanged
+  const [services, setServices] = useState([]);
+  const [location, setLocation] = useState(null);
+  const [payments, setPayments] = useState(null);
+  const [showServiceSelect, setShowServiceSelect] = useState(false);
+
+  const addService = (serviceName) => {
+    const categoryInfo = Object.entries(serviceCategories).find(([_, data]) => 
+      data.services.includes(serviceName)
+    );
+    
+    if (categoryInfo) {
+      setServices([...services, {
+        service: serviceName,
+        price: categoryInfo[1].price,
+        packageType: null
+      }]);
+      setShowServiceSelect(false);
+    }
+  };
+
+  const removeService = (index) => {
+    setServices(services.filter((_, i) => i !== index));
+  };
+
+  const updateService = (index, packageType) => {
+    const updatedServices = [...services];
+    updatedServices[index] = {
+      ...updatedServices[index],
+      packageType
+    };
+    setServices(updatedServices);
+  };
+
+  const isReadyForPayment = () => {
+    return services.length > 0 && services.every(s => s.packageType);
+  };
+
+  const calculateServiceTotal = (service, allServices) => {
+    if (!service.packageType) return 0;
+    const packageInfo = packageTypes[service.packageType];
+    
+    if (service.packageType === 'BOGO 20') {
+      const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
+      
+      if (bogoServices.length >= 2) {
+        // Sort services by price (highest first)
+        const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
+        
+        // First service is full price, all others get 20% off
+        const isHighestPrice = sortedServices[0].service === service.service &&
+                              sortedServices.findIndex(s => s.service === service.service) ===
+                              bogoServices.findIndex(s => s.service === service.service);
+        
+        if (isHighestPrice) {
+          return service.price * 6; // Full price for highest
+        } else {
+          return service.price * 6 * 0.8; // 20% off other services
+        }
+      } else {
+        // If only one BOGO service, charge full price
+        return service.price * 6;
+      }
+    } else if (service.packageType === 'Unlimited') {
+      return service.price * packageInfo.sessions * (1 - packageInfo.discount);
+    } else if (packageInfo.totalMultiplier) {
+      return service.price * packageInfo.totalMultiplier;
+    }
+    
+    return service.price * packageInfo.sessions;
+  };
+
+  const calculatePricePerTreatment = (service, allServices) => {
+    if (!service.packageType) return 0;
+    const packageInfo = packageTypes[service.packageType];
+    const total = calculateServiceTotal(service, allServices);
+    return total / packageInfo.sessions;
+  };
+
+  const calculatePaymentAmount = (service, allServices) => {
+    if (!payments) return 0;
+    const total = calculateServiceTotal(service, allServices);
+    return total / payments;
+  };
+
+  const calculateSubtotal = () => {
+    return services.reduce((sum, service) => sum + calculateServiceTotal(service, services), 0);
+  };
+
+  const calculateTax = () => {
+    if (!location) return 0;
+    const loc = locations.find(l => l.name === location);
+    return calculateSubtotal() * loc.taxRate;
+  };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + calculateTax();
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-[#f4f3f6] font-poppins shadow-lg">
@@ -97,7 +183,7 @@ const LaserPackageCalculator = () => {
           {showServiceSelect && (
             <div className="w-full bg-white rounded-lg border-2 border-[#2c0e45] p-4">
               <Select onValueChange={addService}>
-                <SelectTrigger className="bg-white border-2 border-[#2c0e45] rounded-lg" style={selectTriggerStyle}>
+                <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
                   <SelectValue placeholder="Select treatment area" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
@@ -140,8 +226,8 @@ const LaserPackageCalculator = () => {
                   value={service.packageType}
                   onValueChange={(value) => updateService(index, value)}
                 >
-                  <SelectTrigger className="bg-white border-2 border-[#2c0e45] rounded-lg" style={selectTriggerStyle}>
-                    <SelectValue placeholder="Package Type" />
+                  <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
+                    <SelectValue placeholder="Select package type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                     {Object.keys(packageTypes).map((type) => (
@@ -167,7 +253,7 @@ const LaserPackageCalculator = () => {
               SELECT PAYMENT PLAN
             </label>
             <Select onValueChange={(value) => setPayments(parseInt(value))}>
-              <SelectTrigger className="bg-white border-2 border-[#2c0e45] rounded-lg" style={selectTriggerStyle}>
+              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
                 <SelectValue placeholder="Select payment plan" />
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
@@ -192,7 +278,7 @@ const LaserPackageCalculator = () => {
               SELECT LOCATION
             </label>
             <Select onValueChange={setLocation}>
-              <SelectTrigger className="bg-white border-2 border-[#2c0e45] rounded-lg" style={selectTriggerStyle}>
+              <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
@@ -210,7 +296,58 @@ const LaserPackageCalculator = () => {
           </div>
         )}
 
-        {/* Price Summary remains unchanged */}
+        {/* Price Summary */}
+        {location && payments && (
+          <div className="bg-white p-8 rounded-lg border-2 border-[#2c0e45] shadow-lg">
+            <div className="grid grid-cols-3 gap-8">
+              <div className="text-xl font-bold pb-4 border-b-2 border-[#2c0e45] text-center text-[#2c0e45]">
+                Total Package Price
+              </div>
+              <div className="text-xl font-bold pb-4 border-b-2 border-[#2c0e45] text-center text-[#2c0e45]">
+                Price Per Treatment
+              </div>
+              <div className="text-xl font-bold pb-4 border-b-2 border-[#2c0e45] text-center text-[#2c0e45]">
+                Price Per Payment
+              </div>
+
+              {services.map((service, index) => (
+                <React.Fragment key={index}>
+                  <div className="py-3 text-center">
+                    <span className="font-medium">{service.service}:</span> 
+                    <span className="text-[#e91f4e] font-bold"> ${calculateServiceTotal(service, services).toFixed(2)}</span>
+                    {service.packageType === 'BOGO 20' && services.filter(s => s.packageType === 'BOGO 20').length >= 2 && 
+                     service !== services.filter(s => s.packageType === 'BOGO 20')
+                                          .sort((a, b) => b.price - a.price)[0] && (
+                      <span className="text-[#e91f4e] text-sm ml-1">(20% off)</span>
+                    )}
+                  </div>
+                  <div className="py-3 text-center">
+                    <span className="font-medium">{service.service}:</span> 
+                    <span className="text-[#2c0e45] font-bold"> ${calculatePricePerTreatment(service, services).toFixed(2)}</span>
+                  </div>
+                  <div className="py-3 text-center">
+                    <span className="font-medium">{service.service}:</span> 
+                    <span className="text-[#2c0e45] font-bold"> ${calculatePaymentAmount(service, services).toFixed(2)}</span>
+                  </div>
+                </React.Fragment>
+              ))}
+
+              <div className="pt-4 border-t-2 border-[#2c0e45] text-center">
+                <div className="font-medium">Subtotal: <span className="text-[#e91f4e] font-bold">${calculateSubtotal().toFixed(2)}</span></div>
+                {location === 'Queens' && (
+                  <div className="font-medium">Tax: <span className="text-[#e91f4e] font-bold">${calculateTax().toFixed(2)}</span></div>
+                )}
+                <div className="text-lg font-bold mt-2 text-[#2c0e45]">Total: ${calculateTotal().toFixed(2)}</div>
+              </div>
+              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
+                Total: ${(calculateTotal() / services.reduce((sum, s) => sum + packageTypes[s.packageType].sessions, 0)).toFixed(2)}
+              </div>
+              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
+                Total: ${(calculateTotal() / payments).toFixed(2)}
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
