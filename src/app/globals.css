@@ -26,3 +26,14 @@
     --radius: 0.5rem;
   }
 }
+
+.select-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.select-trigger span {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
