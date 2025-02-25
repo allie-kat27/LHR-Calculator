@@ -6,7 +6,7 @@ const Select = SelectPrimitive.Root
 const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
-    className={className}
+    className={`flex items-center justify-between ${className}`}
     {...props}
   >
     {children}
