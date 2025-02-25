@@ -161,7 +161,7 @@ const LaserPackageCalculator = () => {
 
       <CardHeader className="bg-[#2c0e45] text-white py-6">
         <CardTitle className="text-2xl text-center font-bold font-poppins">
-          EWC Laser Hair Removal Package Calculator
+          EWC Laser Hair Removal Treatment Plan
         </CardTitle>
       </CardHeader>
 
