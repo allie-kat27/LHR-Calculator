@@ -341,12 +341,12 @@ const LaserPackageCalculator = () => {
                 {location === 'Queens' && (
                   <div className="font-medium">Tax: <span className="text-[#2c0e45] font-bold">${calculateTax().toFixed(2)}</span></div>
                 )}
-                <div className="text-lg font-bold mt-2 text-[#2c0e45]">Total: ${calculateTotal().toFixed(2)}</div>
+                <div className="text-lg font-bold mt-2 text-[#e91f4e]">Total: ${calculateTotal().toFixed(2)}</div>
               </div>
               <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
                 Price Per Treatment: ${services.reduce((sum, service) => sum + calculatePricePerTreatment(service, services), 0).toFixed(2)}
               </div>
-              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#e91f4e]">
+              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
                 Price Per Payment: ${(calculateTotal() / (payments || 1)).toFixed(2)}
               </div>
             </div>
