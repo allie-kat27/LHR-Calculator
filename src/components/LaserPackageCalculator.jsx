@@ -93,23 +93,22 @@ const LaserPackageCalculator = () => {
     if (service.packageType === 'BOGO 20') {
       const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
 
-      if (bogoServices.length >= 2) {
-        // Sort services by price (highest first)
-        const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
+      
+      if (bogoServices.length <= 1) {
+        return service.price * 6; // Full price if only one service
+      }
 
-        // First service is full price, all others get 20% off
-        const isHighestPrice = sortedServices[0].service === service.service &&
-                              sortedServices.findIndex(s => s.service === service.service) ===
-                              bogoServices.findIndex(s => s.service === service.service);
+      // Sort services by price (highest first)
+      const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
+      const serviceIndex = sortedServices.findIndex(s => s.service === service.service);
 
-        if (isHighestPrice) {
-          return service.price * 6; // Full price for highest
-        } else {
-          return service.price * 6 * 0.8; // 20% off other services
-        }
+      if (serviceIndex === 0) {
+        return service.price * 6; // Full price for highest
+      } else if (bogoServices.length === 2) {
+        return service.price * 6 * 0.8; // 20% off second service only
       } else {
-        // If only one BOGO service, charge full price
-        return service.price * 6;
+        return service.price * 6 * 0.8; // 20% off all remaining services
+        
       }
     } else if (service.packageType === 'Unlimited') {
       return service.price * packageInfo.sessions * (1 - packageInfo.discount);
