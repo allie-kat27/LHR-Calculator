@@ -58,7 +58,7 @@ const LaserPackageCalculator = () => {
     const categoryInfo = Object.entries(serviceCategories).find(([_, data]) => 
       data.services.includes(serviceName)
     );
-    
+
     if (categoryInfo) {
       setServices([...services, {
         service: serviceName,
@@ -89,19 +89,19 @@ const LaserPackageCalculator = () => {
   const calculateServiceTotal = (service, allServices) => {
     if (!service.packageType) return 0;
     const packageInfo = packageTypes[service.packageType];
-    
+
     if (service.packageType === 'BOGO 20') {
       const bogoServices = allServices.filter(s => s.packageType === 'BOGO 20');
-      
+
       if (bogoServices.length >= 2) {
         // Sort services by price (highest first)
         const sortedServices = [...bogoServices].sort((a, b) => b.price - a.price);
-        
+
         // First service is full price, all others get 20% off
         const isHighestPrice = sortedServices[0].service === service.service &&
                               sortedServices.findIndex(s => s.service === service.service) ===
                               bogoServices.findIndex(s => s.service === service.service);
-        
+
         if (isHighestPrice) {
           return service.price * 6; // Full price for highest
         } else {
@@ -116,7 +116,7 @@ const LaserPackageCalculator = () => {
     } else if (packageInfo.totalMultiplier) {
       return service.price * packageInfo.totalMultiplier;
     }
-    
+
     return service.price * packageInfo.sessions;
   };
 
@@ -161,7 +161,7 @@ const LaserPackageCalculator = () => {
 
       <CardHeader className="bg-[#2c0e45] text-white py-6">
         <CardTitle className="text-2xl text-center font-bold font-poppins">
-          EWC Laser Hair Removal Treatment Plan
+          EWC Laser Hair Removal Package Calculator
         </CardTitle>
       </CardHeader>
 
@@ -227,7 +227,11 @@ const LaserPackageCalculator = () => {
                   onValueChange={(value) => updateService(index, value)}
                 >
                   <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
-                    <SelectValue defaultValue={service.packageType} placeholder="Select package type" />
+                    <SelectValue 
+                      defaultValue={service.packageType} 
+                      className="text-[#2c0e45]" 
+                      placeholder="Package Type" 
+                    />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
                     {Object.keys(packageTypes).map((type) => (
@@ -335,15 +339,15 @@ const LaserPackageCalculator = () => {
               <div className="pt-4 border-t-2 border-[#2c0e45] text-center">
                 <div className="font-medium">Subtotal: <span className="text-[#e91f4e] font-bold">${calculateSubtotal().toFixed(2)}</span></div>
                 {location === 'Queens' && (
-                  <div className="font-medium">Tax: <span className="text-[#e91f4e] font-bold">${calculateTax().toFixed(2)}</span></div>
+                  <div className="font-medium">Tax: <span className="text-[#2c0e45] font-bold">${calculateTax().toFixed(2)}</span></div>
                 )}
                 <div className="text-lg font-bold mt-2 text-[#2c0e45]">Total: ${calculateTotal().toFixed(2)}</div>
               </div>
               <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
-                Total: ${(calculateTotal() / services.reduce((sum, s) => sum + packageTypes[s.packageType].sessions, 0)).toFixed(2)}
+                Price Per Treatment: ${services.reduce((sum, service) => sum + calculatePricePerTreatment(service, services), 0).toFixed(2)}
               </div>
-              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#2c0e45]">
-                Total: ${(calculateTotal() / payments).toFixed(2)}
+              <div className="pt-4 border-t-2 border-[#2c0e45] text-center font-bold text-[#e91f4e]">
+                Price Per Payment: ${(calculateTotal() / (payments || 1)).toFixed(2)}
               </div>
             </div>
           </div>
