@@ -228,8 +228,8 @@ const LaserPackageCalculator = () => {
                   <SelectTrigger className="w-full h-12 bg-white border-2 border-[#2c0e45] rounded-lg">
                     <SelectValue 
                       defaultValue={service.packageType} 
-                      className="text-[#2c0e45]" 
-                      placeholder="Package Type" 
+                      className="text-[#2c0e45] placeholder:text-gray-500" 
+                      placeholder="Package Type"  
                     />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#2c0e45] rounded-lg max-h-[300px] overflow-y-auto">
